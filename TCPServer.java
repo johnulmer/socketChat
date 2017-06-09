@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -14,9 +13,25 @@ import java.util.Collections;
 public class TCPServer {
 	private static final int PORT = 3000;
 
+	private static String intSort(String msg) {
+		String returnString = "";
+		String[] inputs = msg.split(" ");
+		ArrayList numbers = new ArrayList();
+		for (int i =1; i< inputs.length; i++) {
+			try {
+				numbers.add(Integer.parseInt(inputs[i]));
+			} catch (NumberFormatException ex) {
+				return "Invalid sort:  values must be numeric";
+			} // use try catch to throw error when input isn't numeric
+		} //end for loop to confirm sort values are numeric
+		Collections.sort(numbers);
+		returnString = numbers.toString();
+		return returnString;
+	}
+	
 	public static void main(String args[]) {
 		System.out.println("server running...");
-		//ArrayList clients = new ArrayList();
+
 		try {
 			ServerSocket serverSocket = new ServerSocket(TCPServer.PORT);
 			serverSocket.setSoTimeout(10000);
@@ -32,13 +47,7 @@ public class TCPServer {
 				String command = msgText.substring(0, 4);
 
 				if (command.equalsIgnoreCase("sort")) {
-					String[] inputs = msgText.split(" ");
-					ArrayList numbers = new ArrayList();
-					for (int i =1; i< inputs.length; i++) {
-						numbers.add(inputs[i]);
-					}
-					Collections.sort(numbers);
-					responseText = numbers.toString();
+					responseText = TCPServer.intSort(msgText);
 				} else {
 					responseText = msgText.toLowerCase();
 				}
